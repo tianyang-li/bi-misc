@@ -36,9 +36,11 @@ def main(args):
     no_ns = 0
     for fin in args:
         for seq in SeqIO.parse(fin, fmt):
+            all_reads += 1
             if "N" not in str(seq.seq) and "n" not in str(seq.seq):
                 print seq.format(fmt)
-    print "%d in %d no N" % (no_ns, all_reads)
+                no_ns += 1
+    print >> sys.stderr, "%d in %d no N" % (no_ns, all_reads)
     
 if __name__ == '__main__':
     main(sys.argv[1:])    

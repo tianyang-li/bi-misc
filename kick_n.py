@@ -32,10 +32,13 @@ def main(args):
     if fmt == None:
         print >> sys.stderr, "missing options"
         sys.exit(1)
+    all_reads = 0
+    no_ns = 0
     for fin in args:
         for seq in SeqIO.parse(fin, fmt):
-            if "N" not in str(seq.seq):
+            if "N" not in str(seq.seq) and "n" not in str(seq.seq):
                 print seq.format(fmt)
+    print "%d in %d no N" % (no_ns, all_reads)
     
 if __name__ == '__main__':
     main(sys.argv[1:])    

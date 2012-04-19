@@ -23,7 +23,11 @@ import getopt
 import sys
 from Bio import SeqIO
 
+def main(args):
+    
 
+if __name__ == '__main__':
+    main(sys.argv[1:])
 
 
 

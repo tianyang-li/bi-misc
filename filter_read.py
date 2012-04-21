@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  Copyright (C) 2011 Tianyang Li
+#  Copyright (C) 2012 Tianyang Li
 #  tmy1018@gmail.com
 #
 #  This program is free software: you can redistribute it and/or modify

@@ -22,25 +22,53 @@ from Bio import SeqIO
 def main(args):
     fmt = None  # format: FASTA, FASTQ
     try:
-        opts, args = getopt.getopt(args, 'f:')
+        opts, args = getopt.getopt(args, 'f:s:1:2:p:')
     except getopt.GetoptError as err:
         print >> sys.stderr, str(err)
         sys.exit(1)
+    single = None
+    pair1, pair2 = None, None
+    prefix = None
     for opt, arg in opts:
         if opt == '-f':
             fmt = arg
+        if opt == '-s':
+            single = arg
+        if opt == '-1':
+            pair1 = arg
+        if opt == '-2':
+            pair2 = arg
+        if opt == '-p':
+            # prefix of output file
+            prefix = arg
     if fmt == None:
-        print >> sys.stderr, "missing options"
+        print >> sys.stderr, "missing format"
         sys.exit(1)
-    all_reads = 0
-    no_ns = 0
-    for fin in args:
-        for seq in SeqIO.parse(fin, fmt):
-            all_reads += 1
-            if "N" not in str(seq.seq) and "n" not in str(seq.seq):
-                print seq.format(fmt)
-                no_ns += 1
-    print >> sys.stderr, "%d in %d no N" % (no_ns, all_reads)
+    if prefix == None:
+        print >> sys.stderr, "no prefix for output"
+        sys.exit(1)
+    if single != None:
+        all_reads = 0
+        no_ns = 0
+        with open("%s.fastq" % prefix, 'w') as fout:
+            for seq in SeqIO.parse(single, fmt):
+                all_reads += 1
+                if "N" not in str(seq.seq) and "n" not in str(seq.seq):
+                    fout.write(seq.format(fmt))
+                    no_ns += 1
+        print >> sys.stderr, "%d in %d no N" % (no_ns, all_reads)
+    if pair1 != None and pair2 != None:
+        all_pairs = 0
+        no_ns = 0
+        with open("%s_1.fastq" % prefix) as fout1:
+            with open("%s_2.fastq" % prefix) as fout2:
+                for seq1, seq2 in zip(SeqIO.parse(pair1, fmt), SeqIO.parse(pair2, fmt)):
+                    all_pairs += 1
+                    if "N" not in str(seq1.seq) and "n" not in str(seq1.seq) and "N" not in str(seq2.seq) and "n" not in str(seq2.seq):
+                        fout1.write(seq1.format(fmt))
+                        fout2.write(seq2.format(fmt))
+                        no_ns += 1
+        print >> sys.stderr, "%d in %d no N" % (no_ns, all_pairs)
     
 if __name__ == '__main__':
     main(sys.argv[1:])    

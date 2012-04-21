@@ -17,7 +17,6 @@
 
 import getopt
 import sys
-import os
 from itertools import izip
 
 from Bio import SeqIO

@@ -22,10 +22,24 @@ from Bio import SeqIO
 
 def main(args):
     fmt = None
+    try:
+        opts, args = getopt.getopt(args, '', ["format="])
+    except getopt.GetoptError as err:
+        print >> sys.stderr, str(err)
+        sys.exit(1)
+    for opt, arg in opts:
+        if opt == "--format":
+            fmt = arg        
     if not fmt or not args:
         print >> sys.stderr, "missing"
         sys.exit(1)
-    
+        
+    read_count = 0
+    for arg in args:
+        for _ in SeqIO.parse(arg, fmt):
+            read_count += 1
+    print read_count
+        
 if __name__ == '__main__':
     main(sys.argv[1:])    
 

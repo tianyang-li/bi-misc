@@ -18,6 +18,8 @@
 import getopt
 import sys
 
+import pysam
+
 def main():
     paired_bam_file = None
     try:
@@ -25,12 +27,15 @@ def main():
     except getopt.GetoptError as err:
         print >> sys.stderr, str(err)
         sys.exit(1)
-    for opt, arg in opt:
+    for opt, arg in opts:
         if opt == '--bam':
             paired_bam_file = arg
     if not paired_bam_file:
         print >> sys.stderr, "missing"
         sys.exit(1)
+    
+    paired_bam = pysam.Samfile(paired_bam_file, 'rb')
+
     
 if __name__ == '__main__':
     main()        

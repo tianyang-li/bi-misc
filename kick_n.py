@@ -52,7 +52,7 @@ def main(args):
     if single != None:
         all_reads = 0
         no_ns = 0
-        with open("%s.fastq" % prefix, 'w') as fout:
+        with open("%s.%s" % (prefix, fmt), 'w') as fout:
             for seq in SeqIO.parse(single, fmt):
                 all_reads += 1
                 if "N" not in str(seq.seq) and "n" not in str(seq.seq):
@@ -62,8 +62,8 @@ def main(args):
     if pair1 != None and pair2 != None:
         all_pairs = 0
         no_ns = 0
-        with open("%s_1.fastq" % prefix, 'w') as fout1:
-            with open("%s_2.fastq" % prefix, 'w') as fout2:
+        with open("%s_1.%s" % (prefix, fmt), 'w') as fout1:
+            with open("%s_2.%s" % (prefix, fmt), 'w') as fout2:
                 for seq1, seq2 in izip(SeqIO.parse(pair1, fmt), SeqIO.parse(pair2, fmt)):
                     all_pairs += 1
                     if "N" not in str(seq1.seq) and "n" not in str(seq1.seq) and "N" not in str(seq2.seq) and "n" not in str(seq2.seq):

@@ -37,9 +37,15 @@ def main():
         if opt == '--gtf':
             gtf_file = arg
         if opt == '--start':
-            start = int(arg)
+            if arg == "x":
+                start = -1
+            else:
+                start = int(arg)
         if opt == '--end':
-            end = int(arg)
+            if arg == "x":
+                end = float("inf")
+            else:
+                end = int(arg)
         if opt == '--seqname':
             seqname = arg
     if (not seqname 

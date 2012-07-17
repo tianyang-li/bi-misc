@@ -22,9 +22,26 @@ from Bio import SeqIO
 
 def main():
     fmt = None
-    if (not fmt):
+    reads_file = None
+    try:
+        opts, _ = getopt.getopt(sys.argv[1:], 'f:r:')
+    except getopt.GetoptError as err:
+        print >> sys.stderr, str(err)
+        sys.exit(1)
+    for opt, arg in opts:
+        if opt == '-r':
+            reads_file = arg
+        if opt == '-f':
+            fmt = arg
+    if (not fmt
+        or not reads_file):
         print >> sys.stderr, "missing"
         sys.exit(1)
+    read_count = 0
+    for rec in SeqIO.parse(reads_file, fmt):
+        rec.id = "%s.%d" % (rec.id, read_count)
+        print rec.format(fmt)
+        read_count += 1
 
 if __name__ == '__main__':
     main()

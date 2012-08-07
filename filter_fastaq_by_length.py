@@ -17,24 +17,33 @@
 
 import sys
 import getopt
+from itertools import izip
 
 from Bio import SeqIO
+
+class _ActionType(object):
+    single = 1
+    paired = 2
 
 def main():
     fmt = None
     single_file = None
-    single_max = None
-    single_min = None
+    single_max = float('inf')
+    single_min = 0
     
     paired1_file = None
     paired2_file = None
-    paired_max1 = None
-    paired_max2 = None
-    paired_min1 = None
-    paired_min2 = None
+    paired_max1 = float('inf')
+    paired_max2 = float('inf')
+    paired_min1 = 0
+    paired_min2 = 0
+    
+    out_prefix = None
+    
+    action = None
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
-                                'f:s:1:2:',
+                                'f:s:1:2:p:',
                                 ['max=', 'min=',
                                  'max1=', 'max2=',
                                  'min1=', 'min2='])
@@ -46,21 +55,46 @@ def main():
             fmt = arg
         if opt == '-s':
             single_file = arg
+            action = _ActionType.single
         if opt == '-1':
             paired1_file = arg
+            action = _ActionType.paired
         if opt == '-2':
             paired2_file = arg
-    if (not fmt
-        or not(bool(single_file 
-                    and single_max != None 
-                    and single_min != None) 
-               ^ bool(paired1_file and paired2_file
-                      and paired_max1 != None
-                      and paired_max2 != None
-                      and paired_min1 != None
-                      and paired_min2 != None))):
+            action = _ActionType.paired
+        if opt == '-p':
+            out_prefix = arg
+        if opt == '--min':
+            single_min = int(arg)
+        if opt == '--max':
+            single_max = int(arg)
+    if (not fmt or not action or not out_prefix
+        or (action == _ActionType.single
+            and not single_file)
+        or (action == _ActionType.paired
+            and (not paired1_file or not paired2_file))):
         print >> sys.stderr, "missing"
         sys.exit(1)
+    if single_file:
+        with open("%s.%s" % (out_prefix, fmt), 'w') as fout:
+            for rec in SeqIO.parse(single_file, fmt):
+                if len(rec.seq) >= single_min and len(rec.seq) <= single_max:
+                    fout.write("%s" % rec.format(fmt))
+    elif paired1_file and paired2_file:
+        fout1 = open("%s_1.%s" % (out_prefix, fmt), 'w')
+        fout2 = open("%s_2.%s" % (out_prefix, fmt), 'w')
+        
+        for rec1, rec2 in izip(SeqIO.parse(paired1_file, fmt),
+                               SeqIO.parse(paired2_file, fmt)):
+            if (paired_min1 <= len(rec1.seq) 
+                and len(rec1.seq) <= paired_max1
+                and paired_min2 <= len(rec2.seq)
+                and len(rec2.seq) <= paired_max2):
+                fout1.write(rec1.format(fmt))
+                fout2.write(rec2.format(fmt))
+        
+        fout1.close()
+        fout2.close()
 
 if __name__ == '__main__':
     main()

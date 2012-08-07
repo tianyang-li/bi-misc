@@ -24,8 +24,8 @@ range limits starting positions
 
 def main():
     seqname = None
-    start = None
-    end = None
+    start = -1
+    end = float('inf')
     gtf_file = None
     try:
         opts, _ = getopt.getopt(sys.argv[1:], '',
@@ -37,20 +37,12 @@ def main():
         if opt == '--gtf':
             gtf_file = arg
         if opt == '--start':
-            if arg == "x":
-                start = -1
-            else:
-                start = int(arg)
+            start = int(arg)
         if opt == '--end':
-            if arg == "x":
-                end = float("inf")
-            else:
-                end = int(arg)
+            end = int(arg)
         if opt == '--seqname':
             seqname = arg
     if (not seqname 
-        or not start
-        or not end
         or not gtf_file):
         print >> sys.stderr, "missing"
         sys.exit(1)
